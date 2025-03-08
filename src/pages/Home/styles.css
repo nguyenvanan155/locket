@@ -1,0 +1,32 @@
+.typing-container {
+  float: inline-start;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 3px solid white; /* Hiệu ứng con trỏ */
+  width: 0;
+  animation: typing 5s steps(22, end) infinite, blink 0.7s infinite;
+}
+
+@keyframes typing {
+  0% {
+    width: 0;
+  }
+  50% {
+    width: 100%;
+  }
+  80% {
+    width: 100%;
+  }
+  90% {
+    width: 100%;
+  }
+  100% {
+    width: 0;
+  }
+}
+
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
+}

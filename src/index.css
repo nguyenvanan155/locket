@@ -1,0 +1,72 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  /* color-scheme: light dark; */
+  color: rgba(255, 255, 255, 0.87);
+  /* background-color: #242424; */
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --theme-color: #ffffff;
+}
+
+.no-save {
+  pointer-events: none; /* Ngăn mọi tương tác chuột */
+  -webkit-user-drag: none; /* Chrome, Edge, Opera */
+}
+.no-select {
+  user-select: none; /* Chặn chọn chữ trên tất cả trình duyệt */
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE/Edge */
+  pointer-events: none; /* Ngăn mọi tương tác chuột */
+  -webkit-user-drag: none; /* Chrome, Edge, Opera */
+}
+.disable-select {
+  user-select: none; /* Chặn chọn chữ trên tất cả trình duyệt */
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE/Edge */
+  pointer-events: none; /* Ngăn mọi tương tác chuột */
+  -webkit-user-drag: none; /* Chrome, Edge, Opera */
+}
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.bg-locket {
+  background: linear-gradient(black, #2B1F00);
+  background-size: 200% 200%;
+  /* animation: gradientMove 5s ease infinite; */
+  color: white;
+}
+
+.font-lovehouse {
+  font-family: "LoveHouse", system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+@font-face {
+  font-family: "LoveHouse";
+  src: url("src/assets/fonts/LoveHouse.otf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+.notch-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: env(safe-area-inset-top, 30px); /* Xử lý tai thỏ trên iOS */
+  background-color: var(--theme-color);
+  z-index: 9999;
+  pointer-events: none; /* Đảm bảo không ảnh hưởng đến thao tác người dùng */
+}
