@@ -56,7 +56,7 @@
 }
 @font-face {
   font-family: "LoveHouse";
-  src: url("src/assets/fonts/LoveHouse.otf") format("truetype");
+  src: url("/fonts/LoveHouse.otf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
