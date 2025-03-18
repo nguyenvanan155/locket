@@ -14,24 +14,23 @@ const AuthHome = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold text-primary">Welcome to Home Page</h1>
-      <p className="mt-4 text-base-content">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6">
+      <h1 className="text-4xl font-bold">Welcome to Home Page</h1>
+      <p className="mt-4">
         This is a simple Home page built with React & Vite.
       </p>
       <Link
         to="/profile"
-        className="mt-6 px-4 py-2 bg-primary text-white rounded-lg shadow hover:bg-primary-focus"
+        className="mt-6 px-4 py-2 rounded-lg shadow hover:bg-primary-focus"
       >
         Go to Profile
       </Link>
-
-      {/* Theme Controller */}
-      <fieldset className="mt-6 p-4 border rounded-lg shadow">
-        <legend className="font-semibold text-base-content">Select Theme:</legend>
+            {/* Theme Controller */}
+            <fieldset className="mt-6 p-4 border rounded-lg shadow">
+        <legend className="font-semibold">Select Theme:</legend>
         <div className="flex flex-wrap gap-4 mt-2">
           {["light", "dark", "retro", "cyberpunk", "valentine", "aqua"].map((t) => (
-            <label key={t} className="flex gap-2 cursor-pointer items-center text-base-content">
+            <label key={t} className="flex gap-2 cursor-pointer items-center">
               <input
                 type="radio"
                 name="theme-radios"

@@ -4,6 +4,7 @@ import { showToast } from "../../components/Toast";
 import * as locketService from "../../services/locketService";
 import { AuthContext } from "../../context/AuthLocket";
 import "ldrs/ring";
+import * as utils from "../../utils";
 
 const Login = () => {
   const { user, setUser } = useContext(AuthContext);
@@ -14,7 +15,9 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     showToast("info", "Đang đăng nhập Locket!");
+
     setTimeout(async () => {
       try {
         const res = await locketService.login(email, password);
@@ -22,18 +25,27 @@ const Login = () => {
           showToast("error", "Lỗi: Server không trả về dữ liệu!");
           return;
         }
-  
         showToast("success", "Đăng nhập thành công!");
         console.log("User login response:", res);
-  
+
+        // Lưu token & localId vào sessionStorage
+        utils.saveAuthData(
+          res.user.idToken,
+          res.user.localId,
+          parseInt(res.user.expiresIn, 10)
+        );
+
+        const idToken = utils.getAuthToken();
+
         // Lấy thông tin người dùng sau khi login
-        const userData = await locketService.getInfo();
-  
+        const userData = await locketService.getInfo(idToken);
+        //Luu vao local
+        utils.saveUser(userData);
         if (!userData) {
           showToast("error", "Lỗi: Không thể lấy thông tin người dùng!");
           return;
         }
-  
+
         setUser(userData); // Cập nhật state (React sẽ re-render)
       } catch (error) {
         console.error(
@@ -47,9 +59,8 @@ const Login = () => {
       } finally {
         setLoading(false);
       }
-    }, 1000); // Chờ 2 giây mới chạy login logic
+    }, 0); // Chờ 2 giây mới chạy login logic
   };
-  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-base-200">

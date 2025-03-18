@@ -35,17 +35,35 @@ export const logout = async () => {
     throw error.response?.data || error.message; // ✅ Trả về lỗi nếu có
   }
 };
-//Get info
-export const getInfo = async () => {
+export const getInfo = async (idToken) => {
   try {
-    // console.log("📡 Đang lấy thông tin người dùng...");
-    const res = await axios.post(utils.API_URL.GET_INFO_URL, {}, { withCredentials: true });
+    if (!idToken) {
+      throw new Error("Thiếu idToken! Vui lòng đăng nhập lại.");
+    }
 
-    // console.log("✅ Thông tin người dùng nhận được:", res.data);
+    const res = await axios.post(utils.API_URL.GET_INFO_URL, { idToken });
+
+    if (!res.data || !res.data.user) {
+      throw new Error("Dữ liệu trả về không hợp lệ!");
+    }
+
     return res.data.user;
   } catch (error) {
-    // console.error("❌ Lỗi khi lấy thông tin người dùng:", error.response?.data || error.message);
-    throw error; // Quăng lỗi để xử lý trong component
+    let errorMessage = "Lỗi không xác định!";
+    
+    if (error.response) {
+      // Lỗi từ server
+      errorMessage = error.response.data?.message || "Lỗi từ server!";
+    } else if (error.request) {
+      // Lỗi kết nối (không nhận được phản hồi)
+      errorMessage = "Không thể kết nối đến server! Kiểm tra mạng của bạn.";
+    } else {
+      // Lỗi khác
+      errorMessage = error.message;
+    }
+
+    console.error("❌ Lỗi khi lấy thông tin người dùng:", errorMessage);
+    throw new Error(errorMessage); // Quăng lỗi để xử lý trong component
   }
 };
 //Get Momemnt

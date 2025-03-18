@@ -8,50 +8,72 @@ import * as locketService from "../services/locketService"; // Đảm bảo impo
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState("null");
-    const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(utils.getUser());
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        let isMounted = true;
+  useEffect(() => {
+    let isMounted = true;
 
-        const checkAuth = async () => {
-            try {
-                await axios.get(utils.API_URL.CHECK_AUTH_URL, { withCredentials: true });
-                if (isMounted) {
-                    try {
-                        const userData = await locketService.getInfo();
-                        // showToast("success", "Lấy thông tin thành công!");
-                        setUser(userData);
-                    } catch (error) {
-                        // showToast("error", "Không lấy được thông tin người dùng");
-                    }
-                }
-            } catch (error) {
-                if (isMounted) {
-                    //Báo chưa login
-                    // showToast("warning", error.response?.data?.message || "Lỗi xác thực!");
-                    setUser(null);
-                }
-            } finally {
-                if (isMounted) setLoading(false);
-            }
-        };
+    const checkAuth = async () => {
+      try {
+        const idToken = utils.getAuthToken();
+        const localId = utils.getLocalId();
 
-        checkAuth();
+        if (!idToken || !localId) {
+            utils.clearAuthData();
+            setUser(null);
+          // throw new Error("Người dùng chưa đăng nhập!");
+          return showToast("error", "Vui lòng đăng nhập!");
+        }
 
-        return () => { isMounted = false; }; // Cleanup tránh memory leak
-    }, []);
+        await axios.get(utils.API_URL.CHECK_AUTH_URL, {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "X-User-Id": localId,
+          },
+          withCredentials: true,
+        });
 
-    return useMemo(() => (
-        <AuthContext.Provider value={{ user, setUser, loading }}>
-            {children}
-        </AuthContext.Provider>
-    ), [user, loading]);
+        if (isMounted) {
+          try {
+            const userData = await locketService.getInfo(idToken);
+            utils.saveUser(userData);
+          } catch (error) {
+            utils.removeUser();
+            utils.clearAuthData();
+            console.error("Không lấy được thông tin người dùng:", error);
+          }
+        }
+      } catch (error) {
+        if (isMounted) {
+          console.warn("Lỗi xác thực:", error);
+          setUser(null);
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
 
+    checkAuth();
+
+    return () => {
+      isMounted = false;
+    }; // Cleanup tránh memory leak
+  }, []);
+
+
+  return useMemo(
+    () => (
+      <AuthContext.Provider value={{ user, setUser, loading }}>
+        {children}
+      </AuthContext.Provider>
+    ),
+    [user, loading]
+  );
 };
 
 AuthProvider.propTypes = {
-    children: PropTypes.node.isRequired,
+  children: PropTypes.node.isRequired,
 };
 
 export default AuthProvider;

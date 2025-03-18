@@ -1,27 +1,42 @@
 import { useEffect, useState } from "react";
 import { mirage } from "ldrs";
 
-const Loading = () => {
+const themeColors = {
+  light: "black",
+  dark: "white",
+  retro: "#ff9800", // Cam
+  cyberpunk: "#ff0077", // Hồng Neon
+  valentine: "oklch(52% .223 3.958)", // Đỏ Hồng
+  aqua: "#00d4ff", // Xanh Biển
+};
+
+const Loading = ({ isLoading }) => {
   mirage.register();
-  const [color, setColor] = useState("black");
+  const [color, setColor] = useState(themeColors.light);
 
   useEffect(() => {
-    const checkDarkMode = () =>
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-    setColor(checkDarkMode() ? "white" : "black");
+    const getTheme = () => localStorage.getItem("theme") || "light";
 
-    const listener = (e) => setColor(e.matches ? "white" : "black");
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", listener);
-
-    return () => {
-      window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", listener);
+    const updateColor = () => {
+      const currentTheme = getTheme();
+      setColor(themeColors[currentTheme] || themeColors.light);
     };
+
+    updateColor();
+
+    const observer = new MutationObserver(updateColor);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+    return () => observer.disconnect();
   }, []);
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center z-50 transition-colors bg-white dark:bg-black">
-      <l-mirage size="60" speed="2.5" color={color}></l-mirage>
-      {/* <p className="mt-4 text-black dark:text-white">Đang tải...</p> */}
+    <div
+      className={`fixed inset-0 flex flex-col items-center justify-center z-50 bg-base-100 text-base-content transition-opacity duration-700 ${
+        isLoading ? "opacity-100 scale-100" : "opacity-0 scale-90 pointer-events-none"
+      }`}
+    >
+      <l-mirage size="90" speed="2.5" stroke={color}></l-mirage>
     </div>
   );
 };

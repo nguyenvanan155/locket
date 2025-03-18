@@ -32,7 +32,7 @@ const DefaultLayout = ({ children }) => {
       {isLoading && (<Loading/>)}
 
       {/* Nội dung chính */}
-      <main className="overflow-auto">{children}</main>
+      <main className="overflow-auto bg-base-200 text-base-content">{children}</main>
     </div>
   );
 };

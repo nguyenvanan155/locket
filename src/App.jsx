@@ -10,6 +10,7 @@ import { publicRoutes, authRoutes } from "./routes";
 import DefaultLayout from "./layouts/MainLayout";
 import { AuthProvider, AuthContext } from "./context/AuthLocket";
 import { ThemeProvider } from "./context/ThemeContext"; // 🟢 Import ThemeProvider
+import { showToast } from "./components/Toast";
 import Loading from "./components/Loading";
 import ToastProvider from "./components/Toast";
 
@@ -35,10 +36,13 @@ function AppContent() {
     const allRoutes = [...publicRoutes, ...authRoutes];
     const currentRoute = allRoutes.find((route) => route.path === location.pathname);
     document.title = currentRoute ? currentRoute.title : "Ứng dụng của bạn";
+    // if (!user) {
+    //   showToast("error", "Vui lòng đăng nhập!");
+    // }
   }, [location.pathname]);
-
   // Nếu đang kiểm tra xác thực, hiển thị loading
-  if (loading) return <Loading />;
+  if (loading) return <Loading isLoading={true}/>;
+
 
   return (
     <Routes>
