@@ -1,70 +1,38 @@
 import React from "react";
-import { Circle, ArrowRight } from "lucide-react";
-import "./Timeline.css";
-
 import { defaultHistorys } from "../../../data/historyData";
 
-  export default function Timeline() {
-    return (
-      <div className="w-full mx-auto py-10 px-7 h-full">
-        <div className="h-16"></div>
-        <h2 className="text-3xl font-bold text-center mb-8">
-          Lịch sử cập nhật
-        </h2>
-        <div className="relative pl-6">
-          {/* Đường dọc */}
-          <div className="absolute left-3 bottom-0 w-1 animate-expand h-full bg-primary">
-          <div className="absolute z-10 top-0 -ml-1 -mt-1.5 border-l-8 border-r-8 border-b-8 border-transparent"
-              style={{
-                width: "0",
-                height: "0",
-                borderLeft: "6px solid transparent",
-                borderRight: "6px solid transparent",
-                borderBottom: "8px solid currentColor",
-                color: "var(--primary)"
-              }}></div>
-          </div>
-  
-          {defaultHistorys.map((update, index) => (
-            <div
-              key={index}
-              className="relative flex items-start space-x-4 pt-5 animate-zoomIn "
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              {/* Chấm tròn có hiệu ứng "pulse" */}
-              <div
-                className="relative z-10 bg-primary rounded-full animate-pulseEffect mt-4 animate-pulseWave"
-                style={{ animationDelay: `${index * 0.1 + 0.2}s` }}
+export default function Timeline() {
+  return (
+    <div className="w-full md:w-[50%] mx-auto py-10 px-7 h-full">
+    <div className="h-16"></div>
+      <h1 className="text-3xl font-bold text-center mb-8">Lịch sử cập nhật</h1>
+      <ul className="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">
+        {defaultHistorys.map((update, index) => (
+          <li key={index}>
+            {index !== 0 && <hr />}
+            <div className="timeline-middle">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="h-5 w-5"
               >
-                <Circle size={14} className="text-white" />
-              </div>
-              {/* Nội dung */}
-              <div className="relative bg-base-100 border-base-300 text-base-content p-4 rounded-lg shadow-md w-full animate-slideUp">
-              {/* Tam giác cạnh trái */}
-              <div className="absolute top-4 -left-2 w-0 h-0 border-t-8 border-b-8 border-r-8 border-t-transparent border-b-transparent"></div>
-                
-                <span className="absolute underline font-semibold text-blue z-10 top-1 right-2 text-md text-base-content">
-                  {update.date}
-                </span>
-                <span className="absolute bottom-1 right-2 font-lovehouse">
-                  Dio
-                </span>
-                <h3 className="flex flex-row items-center text-lg font-semibold py-2">
-                  {update.title}
-                </h3>
-                <div className="flex items-start justify-start pb-2">
-                  <span className="arrow-animate">
-                    <ArrowRight size={22} className="text-green-500 mr-2 mt-2" />
-                  </span>
-                  <p className="flex flex-row items-center whitespace-pre-line">
-                    {update.description}
-                  </p>
-                </div>
-              </div>
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                  clipRule="evenodd"
+                />
+              </svg>
             </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-  
+            <div className={`timeline-${index % 2 === 0 ? "start" : "end"} mb-10 md:text-${index % 2 === 0 ? "end" : "start"}`}>
+              <time className="font-mono italic">{update.date}</time>
+              <div className="text-lg font-black">{update.title}</div>
+              <p className="whitespace-pre-line">{update.description}</p>
+            </div>
+            <hr />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}

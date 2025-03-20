@@ -1,5 +1,10 @@
 export const defaultHistorys = [
   {
+    date: "08-03-2025",
+    title: "Ra mắt tính năng Theme",
+    description: `Giờ đây, bạn có thể tùy chỉnh giao diện theo phong cách riêng! Hệ thống theme mới giúp trang web trở nên sống động và cá nhân hóa hơn bao giờ hết.`,
+  },
+  {
     date: "07-03-2025",
     title: "Thêm API GetLastestMoment",
     description: `Phát triển và triển khai API GetLastestMoment để lấy bài viết mới nhất từ bạn bè trên Locket`,

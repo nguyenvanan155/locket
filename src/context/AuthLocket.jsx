@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
             utils.clearAuthData();
             setUser(null);
           // throw new Error("Người dùng chưa đăng nhập!");
-          return showToast("error", "Vui lòng đăng nhập!");
+          // return showToast("error", "Vui lòng đăng nhập!");
         }
 
         await axios.get(utils.API_URL.CHECK_AUTH_URL, {

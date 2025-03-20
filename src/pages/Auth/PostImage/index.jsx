@@ -1,5 +1,4 @@
 import React, { useState, useRef, useCallback } from "react";
-import axios from "axios";
 import Cropper from "react-easy-crop";
 import { getCroppedImg } from "./cropImage.js";
 import {
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import { showToast } from "../../../components/Toast/index.jsx";
 import * as lockerService from "../../../services/locketService.js";
+import * as utils from "../../../utils";
 
 const Post = () => {
   const [caption, setCaption] = useState("");
@@ -79,6 +79,9 @@ const Post = () => {
       showToast("warning", "File không hợp lệ!");
       return;
     }
+
+    formData.append("idToken", utils.getAuthToken());
+    formData.append("localId", utils.getLocalId());
 
     formData.append("caption", caption);
     // Gửi option dưới dạng JSON string

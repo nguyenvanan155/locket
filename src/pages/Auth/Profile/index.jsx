@@ -1,7 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../context/AuthLocket";
-import { showToast } from "../../../components/Toast";
-import * as locketService from "../../../services/locketService";
 
 export default function Profile() {
   const { user, setUser } = useContext(AuthContext);
