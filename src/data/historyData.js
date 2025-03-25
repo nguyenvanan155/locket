@@ -1,5 +1,10 @@
 export const defaultHistorys = [
   {
+    date: "09-03-2025",
+    title: "Triển khai website lên Firebase Hosting",
+    description: "Hoàn tất việc triển khai website lên Firebase Hosting! Giờ đây, trang web có thể hoạt động trực tuyến một cách nhanh chóng và ổn định, sẵn sàng để mọi người truy cập."
+  },  
+  {
     date: "08-03-2025",
     title: "Ra mắt tính năng Theme",
     description: `Giờ đây, bạn có thể tùy chỉnh giao diện theo phong cách riêng! Hệ thống theme mới giúp trang web trở nên sống động và cá nhân hóa hơn bao giờ hết.`,

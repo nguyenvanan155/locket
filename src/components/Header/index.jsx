@@ -4,6 +4,7 @@ import { Menu } from "lucide-react";
 import { AuthContext } from "../../context/AuthLocket";
 import ThemeDropdown from "../ThemDropdown";
 import Sidebar from "../Sidebar";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const { user, setUser } = useContext(AuthContext);
@@ -12,7 +13,7 @@ const Header = () => {
   return (
     <>
       <header className="navbar fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3 shadow-xsm bg-base-100 text-base-content border-base-300">
-        <div className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <span className="font-semibold gradient-text disable-select">
             Locket Pro
           </span>
@@ -22,7 +23,7 @@ const Header = () => {
             className="w-7 h-7 object-contain -ml-1 disable-select"
             draggable="false"
           />
-        </div>
+        </Link>
 
         <div className="flex items-center gap-2">
           {/* <ThemeDropdown /> */}

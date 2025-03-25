@@ -39,14 +39,21 @@ export const AuthProvider = ({ children }) => {
             const userData = await locketService.getInfo(idToken);
             utils.saveUser(userData);
           } catch (error) {
+
             utils.removeUser();
             utils.clearAuthData();
+
             console.error("Không lấy được thông tin người dùng:", error);
           }
         }
       } catch (error) {
         if (isMounted) {
+          
+          utils.removeUser();
+          utils.clearAuthData();
+          
           console.warn("Lỗi xác thực:", error);
+
           setUser(null);
         }
       } finally {

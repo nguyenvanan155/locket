@@ -1,9 +1,9 @@
 import { useState, useContext } from "react";
-import { showToast } from "../../components/Toast";
-import * as locketService from "../../services/locketService";
-import { AuthContext } from "../../context/AuthLocket";
+import { showToast } from "../../../components/Toast";
+import * as locketService from "../../../services/locketService";
+import { AuthContext } from "../../../context/AuthLocket";
 import "ldrs/ring";
-import * as utils from "../../utils";
+import * as utils from "../../../utils";
 
 const Login = () => {
   const { setUser } = useContext(AuthContext);

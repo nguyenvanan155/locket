@@ -4,26 +4,26 @@ import AuthHome from "../pages/Auth/Home";
 import Post from "../pages/Auth/PostImage";
 import PostVideo from "../pages/Auth/PostVideo";
 import Profile from "../pages/Auth/Profile";
-import Home from "../pages/Home";
-import Login from "../pages/Login";
+import Home from "../pages/Public/Home";
+import Login from "../pages/Public/Login";
 import Timeline from "../pages/Public/Timeline";
 
-const APP_NAME = "Locket - Đăng ảnh & Video lên Locket";
+const APP_NAME = "💛Locket Pro - Đăng ảnh & Video lên Locket";
 
 // 📌 Các route dành cho người chưa đăng nhập
 const publicRoutes = [
   { path: "/", component: Home, title: `${APP_NAME} | Trang Chủ` },
-  { path: "/test", component: AuthHome, title: `Test` },
-  { path: "/login", component: Login, title: `Đăng Nhập | ${APP_NAME}` },
+  { path: "/test", component: AuthHome, title: `${APP_NAME} | Test` },
+  { path: "/login", component: Login, title: `${APP_NAME} | Đăng Nhập` },
 ];
 
 // 📌 Các route yêu cầu đăng nhập
 const authRoutes = [
-  { path: "/home", component: AuthHome, title: `Trang chủ | ${APP_NAME}` },
-  { path: "/profile", component: Profile, title: `Hồ sơ | ${APP_NAME}` },
-  { path: "/post", component: Post, title: `Đăng Ảnh Mới | ${APP_NAME}` },
-  { path: "/test", component: PostVideo, title: `Đăng Video Mới | ${APP_NAME}` },
-  { path: "/timeline", component: Timeline, title: `Dòng Thời Gian | ${APP_NAME}` },
+  { path: "/home", component: AuthHome, title: `${APP_NAME} | Trang chủ` },
+  { path: "/profile", component: Profile, title: `${APP_NAME} | Hồ sơ` },
+  { path: "/post", component: Post, title: `${APP_NAME} | Đăng Ảnh Mới` },
+  { path: "/test", component: PostVideo, title: `${APP_NAME} | Đăng Video Mới` },
+  { path: "/timeline", component: Timeline, title: `${APP_NAME} | Dòng Thời Gian` },
 ];
 
 // 📌 Các route dành cho admin (nếu có)

@@ -7,12 +7,13 @@ export default function Profile() {
   const [userinfo, setUserinfo] = useState({});
 
   // Convert timestamp thành ngày giờ đọc được
-  const formatDate = (timestamp) => {
-    if (!timestamp) return "Không có dữ liệu";
-    return new Date(parseInt(timestamp)).toLocaleString("vi-VN", {
-      timeZone: "Asia/Ho_Chi_Minh",
-    });
-  };
+const formatDate = (timestamp) => {
+  if (!timestamp) return "Không có dữ liệu";
+  return new Date(parseInt(timestamp)).toLocaleDateString("vi-VN", {
+    timeZone: "Asia/Ho_Chi_Minh",
+  });
+};
+
   useEffect(() => {
     const fetchLatestMoment = async () => {
       try {
@@ -53,8 +54,8 @@ export default function Profile() {
 
       {/* Thông tin tài khoản chi tiết */}
       <div className="mt-6 bg-base-100 border-base-300 text-base-content p-6 rounded-lg shadow-md w-full max-w-2xl">
-        <h2 className="text-xl font-semibold border-b pb-2 mb-4">Thông tin tài khoản</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <h2 className="text-xl font-semibold pb-2">Thông tin tài khoản:</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-1 rounded-md p-3 card-body">
           <InfoRow label="UID" value={user?.localId} />
           <InfoRow label="Email" value={user?.email} />
           <InfoRow label="Tên hiển thị" value={user?.displayName} />
@@ -71,7 +72,7 @@ export default function Profile() {
 
 // Component hiển thị từng dòng thông tin
 const InfoRow = ({ label, value }) => (
-  <div className="border-b pb-2">
+  <div className="">
     <span className="font-semibold">{label}:</span>{" "}
     <span className="font-extrabold">{value || "Không có dữ liệu"}</span>
   </div>

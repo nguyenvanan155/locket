@@ -34,6 +34,8 @@ const themes = [
 ];
 
 const AuthHome = () => {
+  const [iframeUrl, setIframeUrl] = useState("https://locket-dio.web.app");
+
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") || "default"
   );
@@ -62,15 +64,16 @@ const AuthHome = () => {
             Khám phá ngay
           </Link>
         </div>
-        <div className="flex justify-center disable-select skeleton">
+        <div className="flex justify-center disable-select">
           <div className="mockup-browser border border-base-300 w-full">
             <div className="mockup-browser-toolbar">
-              <div className="input p-1">https://locket-dio.web.app</div>
+              <div className="input p-1">{iframeUrl}</div>
             </div>
-            <div className="h-80 w-full relative overflow-hidden">
+            <div className="h-80 w-full relative overflow-hidden select-none">
               <iframe
-                src="https://locket-pro.web.app"
-                className="absolute top-0 left-0 w-[125%] h-[125%] border-0 rounded-b-lg scale-[0.8] origin-top-left"
+                src="https://locket-pro.vercel.app"
+                sandbox="allow-scripts allow-same-origin"
+                className="absolute top-0 left-0 w-[125%] h-[125%] border-0 rounded-b-lg scale-[0.8] origin-top-left pointer-events-none"
               ></iframe>
             </div>
           </div>
@@ -98,19 +101,19 @@ const AuthHome = () => {
       </div>
 
       {/* Theme Selector with Preview */}
-      <fieldset className="mt-10 p-4 border rounded-lg shadow w-full max-w-3xl">
+      <fieldset className="mt-10 p-4 border rounded-lg shadow w-full max-w-6xl">
         <legend className="font-semibold text-lg">🎨 Chọn Giao Diện:</legend>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-3">
           {themes.map((t) => (
             <label
               key={t}
               className={`flex flex-col items-center gap-2 p-2 rounded-lg shadow transition tooltip
-    bg-base-100 hover:bg-base-300 
-    ${
-      theme === t
-        ? "outline-3 outline-dotted outline-primary opacity-50 cursor-not-allowed"
-        : "cursor-pointer"
-    }`}
+              bg-base-100 hover:bg-base-300 
+              ${
+                theme === t
+                  ? "outline-3 outline-dotted outline-primary opacity-50 cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
               data-theme={t}
               data-tip={t}
             >

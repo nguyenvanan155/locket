@@ -13,6 +13,7 @@ import { ThemeProvider } from "./context/ThemeContext"; // 🟢 Import ThemeProv
 import { showToast } from "./components/Toast";
 import Loading from "./components/Loading";
 import ToastProvider from "./components/Toast";
+import NotFoundPage from "./components/404";
 
 function App() {
   return (
@@ -83,6 +84,9 @@ function AppContent() {
         publicRoutes.map(({ path }, index) => (
           <Route key={index} path={path} element={<Navigate to="/home" />} />
         ))}
+
+      <Route path="*" element={<NotFoundPage />} />
+
     </Routes>
   );
 }

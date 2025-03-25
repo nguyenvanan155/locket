@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./styles.css";
 import { Link } from "react-router-dom";
+import AnimatedButton from "../../../components/3dButton";
 
 const words = [
   "Welcome to Locket Pro! 🚀",
@@ -39,6 +40,7 @@ const Home = () => {
       >
         Login now
       </Link>
+      {/* <AnimatedButton/> */}
     </div>
   );
 };
