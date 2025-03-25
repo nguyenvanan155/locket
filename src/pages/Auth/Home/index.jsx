@@ -35,7 +35,7 @@ const themes = [
 
 const AuthHome = () => {
   const [iframeUrl, setIframeUrl] = useState("https://locket-dio.web.app");
-
+  const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") || "default"
   );

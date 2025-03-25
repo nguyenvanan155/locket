@@ -2,8 +2,8 @@ import { useState, useContext } from "react";
 import { showToast } from "../../../components/Toast";
 import * as locketService from "../../../services/locketService";
 import { AuthContext } from "../../../context/AuthLocket";
-import "ldrs/ring";
 import * as utils from "../../../utils";
+import LoadingRing from "../../../components/UI/Loading/ring";
 
 const Login = () => {
   const { setUser } = useContext(AuthContext);
@@ -74,8 +74,7 @@ const Login = () => {
           >
             {loading ? (
               <>
-              {/* <Ring size={20} lineWeight={5} speed={2} color="white" /> */}
-                <l-ring size="20" stroke="2" speed="2" color="white"></l-ring>
+                <LoadingRing size={20} stroke={3} speed={2} color="white"/>
                 Đang đăng nhập...
               </>
             ) : (

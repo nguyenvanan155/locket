@@ -1,9 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../context/AuthLocket";
+import LoadingRing from "../../../components/UI/Loading/ring";
 
 export default function Profile() {
   const { user, setUser } = useContext(AuthContext);
-  const [loading, setLoading] = useState(true);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const [userinfo, setUserinfo] = useState({});
 
   // Convert timestamp thành ngày giờ đọc được
@@ -41,11 +42,21 @@ const formatDate = (timestamp) => {
 
       {/* Thông tin cơ bản */}
       <div className="flex flex-row items-center bg-base-100 border-base-300 text-base-content p-6 rounded-lg shadow-lg w-full max-w-2xl disable-select">
+      <div className="relative w-24 h-24">
+        {!imageLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <LoadingRing size={40} stroke={5} color="blue" />
+          </div>
+        )}
         <img
           src={user?.photoUrl || "/default-avatar.png"}
           alt="Profile"
-          className="w-24 h-24 rounded-full shadow-md outline-4 outline-amber-400"
+          className={`w-24 h-24 rounded-full shadow-md outline-4 outline-amber-400 transition-opacity duration-300 ${
+            imageLoaded ? "opacity-100" : "opacity-0"
+          }`}
+          onLoad={() => setImageLoaded(true)}
         />
+      </div>
         <div className="flex flex-col pl-5 text-center items-start">
           <h2 className="text-2xl font-semibold">{user?.displayName || "Không có tên"}</h2>
           <p className="text-lg">{user?.email || "Không có email"}</p>
