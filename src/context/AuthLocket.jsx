@@ -8,33 +8,26 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(utils.getUser());
-  const [loading, setLoading] = useState(!user); // Nếu đã có user, không cần loading
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
 
     const checkAuth = async () => {
       try {
-        // Nếu đã có user => Không cần xác thực lại
-        if (user) {
-          setLoading(false);
-          return;
-        }
-
         const idToken = utils.getAuthToken();
         const localId = utils.getLocalId();
 
-        if (!idToken || !localId) {
-          throw new Error("Thiếu thông tin xác thực!");
+        if (!idToken) {
+          utils.clearAuthData();
+          setUser(null);
+          return;
         }
 
         const userData = await locketService.getInfo(idToken, localId);
-        if (!userData || !userData.uid) {
-          throw new Error("Thông tin người dùng không hợp lệ!");
-        }
-
         if (isMounted) {
-          setUser(userData);
+          // utils.saveUser(userData);
+          // setUser(userData);
         }
       } catch (error) {
         if (isMounted) {
@@ -48,13 +41,12 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
-    // Chỉ gọi API nếu chưa có user
-    if (!user) checkAuth();
+    checkAuth();
 
     return () => {
       isMounted = false;
     };
-  }, [user]);
+  }, []);
 
   return useMemo(
     () => (

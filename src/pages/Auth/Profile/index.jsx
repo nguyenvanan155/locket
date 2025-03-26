@@ -48,7 +48,7 @@ export default function Profile() {
 
       {/* Thông tin cơ bản */}
       <div className="flex flex-row items-center bg-base-100 border-base-300 text-base-content p-6 rounded-lg shadow-lg w-full max-w-2xl">
-        <div className="relative w-24 h-24  disable-select">
+        <div className="avatar relative w-24 h-24  disable-select">
           {!imageLoaded && (
             <div className="absolute inset-0 flex items-center justify-center">
               <LoadingRing size={40} stroke={5} color="blue" />
@@ -72,7 +72,7 @@ export default function Profile() {
             href={`https://locket.cam/${user?.username}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-500 hover:underline font-medium"
+            className="link-primary underline font-semibold text-lg"
           >
             https://locket.cam/{user?.username}
           </a>
