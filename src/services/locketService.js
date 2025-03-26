@@ -35,13 +35,44 @@ export const logout = async () => {
     throw error.response?.data || error.message; // ✅ Trả về lỗi nếu có
   }
 };
-export const getInfo = async (idToken) => {
+export const getInfocheckAuth = async (idToken, localId) => {
   try {
     if (!idToken) {
       throw new Error("Thiếu idToken! Vui lòng đăng nhập lại.");
     }
 
-    const res = await axios.post(utils.API_URL.GET_INFO_URL, { idToken });
+    const res = await axios.post(utils.API_URL.CHECK_AUTH_URL, { idToken, localId });
+
+    if (!res.data || !res.data.user) {
+      throw new Error("Dữ liệu trả về không hợp lệ!");
+    }
+
+    return res.data.user;
+  } catch (error) {
+    let errorMessage = "Lỗi không xác định!";
+    
+    if (error.response) {
+      // Lỗi từ server
+      errorMessage = error.response.data?.message || "Lỗi từ server!";
+    } else if (error.request) {
+      // Lỗi kết nối (không nhận được phản hồi)
+      errorMessage = "Không thể kết nối đến server! Kiểm tra mạng của bạn.";
+    } else {
+      // Lỗi khác
+      errorMessage = error.message;
+    }
+
+    console.error("❌ Lỗi khi lấy thông tin người dùng:", errorMessage);
+    throw new Error(errorMessage); // Quăng lỗi để xử lý trong component
+  }
+};
+export const getInfo = async (idToken, localId) => {
+  try {
+    if (!idToken) {
+      throw new Error("Thiếu idToken! Vui lòng đăng nhập lại.");
+    }
+
+    const res = await axios.post(utils.API_URL.GET_INFO_URL, { idToken, localId });
 
     if (!res.data || !res.data.user) {
       throw new Error("Dữ liệu trả về không hợp lệ!");

@@ -8,58 +8,74 @@ export default function Profile() {
   const [userinfo, setUserinfo] = useState({});
 
   // Convert timestamp thành ngày giờ đọc được
-const formatDate = (timestamp) => {
-  if (!timestamp) return "Không có dữ liệu";
-  return new Date(parseInt(timestamp)).toLocaleDateString("vi-VN", {
-    timeZone: "Asia/Ho_Chi_Minh",
-  });
-};
+  const formatDate = (timestamp) => {
+    if (!timestamp) return "Không có dữ liệu";
+    return new Date(parseInt(timestamp)).toLocaleDateString("vi-VN", {
+      timeZone: "Asia/Ho_Chi_Minh",
+    });
+  };
 
   useEffect(() => {
     const fetchLatestMoment = async () => {
       try {
         console.log("start get");
         // const response = await locketService.getLatestMoment();
-        console.log(user)
+        console.log(user);
         // console.log(response);
         // return response.data;
       } catch (error) {
-        console.error("❌ Lỗi khi gọi API latest moment:", error.response?.data.success || error.message);
+        console.error(
+          "❌ Lỗi khi gọi API latest moment:",
+          error.response?.data.success || error.message
+        );
         return null;
       }
     };
-  
+
     fetchLatestMoment();
-  }, []);  // ✅ Dependency array rỗng => chỉ chạy khi component mount
-  
+  }, []); // ✅ Dependency array rỗng => chỉ chạy khi component mount
+
   return (
     <div className="flex flex-col items-center min-h-screen w-full px-6 py-10">
       <div className="h-16"></div>
       <h1 className="text-3xl font-bold pb-6">
-        Chào mừng, "<span className="">{user?.displayName || "Người dùng"}</span>" đến
-        với tài khoản của bạn!
+        Chào mừng, "
+        <span className="">
+          {user?.firstName} {user?.lastName}
+        </span>
+        " đến với tài khoản của bạn!
       </h1>
 
       {/* Thông tin cơ bản */}
-      <div className="flex flex-row items-center bg-base-100 border-base-300 text-base-content p-6 rounded-lg shadow-lg w-full max-w-2xl disable-select">
-      <div className="relative w-24 h-24">
-        {!imageLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <LoadingRing size={40} stroke={5} color="blue" />
-          </div>
-        )}
-        <img
-          src={user?.photoUrl || "/default-avatar.png"}
-          alt="Profile"
-          className={`w-24 h-24 rounded-full shadow-md outline-4 outline-amber-400 transition-opacity duration-300 ${
-            imageLoaded ? "opacity-100" : "opacity-0"
-          }`}
-          onLoad={() => setImageLoaded(true)}
-        />
-      </div>
+      <div className="flex flex-row items-center bg-base-100 border-base-300 text-base-content p-6 rounded-lg shadow-lg w-full max-w-2xl">
+        <div className="relative w-24 h-24  disable-select">
+          {!imageLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <LoadingRing size={40} stroke={5} color="blue" />
+            </div>
+          )}
+          <img
+            src={user?.profilePicture || "/default-avatar.png"}
+            alt="Profile"
+            className={`w-24 h-24 rounded-full shadow-md outline-4 outline-amber-400 transition-opacity duration-300 ${
+              imageLoaded ? "opacity-100" : "opacity-0"
+            }`}
+            onLoad={() => setImageLoaded(true)}
+          />
+        </div>
         <div className="flex flex-col pl-5 text-center items-start">
-          <h2 className="text-2xl font-semibold">{user?.displayName || "Không có tên"}</h2>
+          <h2 className="text-2xl font-semibold">
+            {user?.firstName} {user?.lastName}
+          </h2>
           <p className="text-lg">{user?.email || "Không có email"}</p>
+          <a
+            href={`https://locket.cam/${user?.username}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:underline font-medium"
+          >
+            https://locket.cam/{user?.username}
+          </a>
         </div>
       </div>
 
@@ -67,14 +83,23 @@ const formatDate = (timestamp) => {
       <div className="mt-6 bg-base-100 border-base-300 text-base-content p-6 rounded-lg shadow-md w-full max-w-2xl">
         <h2 className="text-xl font-semibold pb-2">Thông tin tài khoản:</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-1 rounded-md p-3 card-body">
-          <InfoRow label="UID" value={user?.localId} />
+          <InfoRow label="UID" value={user?.uid} />
           <InfoRow label="Email" value={user?.email} />
           <InfoRow label="Tên hiển thị" value={user?.displayName} />
           <InfoRow label="Số điện thoại" value={user?.phoneNumber} />
-          <InfoRow label="Đăng nhập lần cuối" value={formatDate(user?.lastLoginAt)} />
+          <InfoRow
+            label="Đăng nhập lần cuối"
+            value={formatDate(user?.lastLoginAt)}
+          />
           <InfoRow label="Tạo tài khoản" value={formatDate(user?.createdAt)} />
-          <InfoRow label="Cập nhật lần cuối" value={formatDate(user?.lastRefreshAt)} />
-          <InfoRow label="Xác thực tùy chỉnh" value={user?.customAuth ? "Có" : "Không"} />
+          <InfoRow
+            label="Cập nhật lần cuối"
+            value={formatDate(user?.lastRefreshAt)}
+          />
+          <InfoRow
+            label="Xác thực tùy chỉnh"
+            value={user?.customAuth ? "Có" : "Không"}
+          />
         </div>
       </div>
     </div>

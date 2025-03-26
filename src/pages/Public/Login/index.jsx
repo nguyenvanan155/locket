@@ -24,9 +24,10 @@ const Login = () => {
 
       // Lấy token sau khi lưu
       const idToken = utils.getAuthToken();
+      const localId = utils.getLocalId();
 
       // Lấy thông tin người dùng
-      const userData = await locketService.getInfo(idToken);
+      const userData = await locketService.getInfo(idToken, localId);
       if (!userData) throw new Error("Không thể lấy thông tin người dùng!");
 
       // Lưu user vào localStorage và cập nhật state

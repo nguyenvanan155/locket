@@ -1,73 +1,60 @@
 import { createContext, useEffect, useState, useMemo } from "react";
 import PropTypes from "prop-types";
-import axios from "axios";
 import * as utils from "../utils";
 import { showToast } from "../components/Toast";
-import * as locketService from "../services/locketService"; // Đảm bảo import
+import * as locketService from "../services/locketService";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(utils.getUser());
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!user); // Nếu đã có user, không cần loading
 
   useEffect(() => {
     let isMounted = true;
 
     const checkAuth = async () => {
       try {
+        // Nếu đã có user => Không cần xác thực lại
+        if (user) {
+          setLoading(false);
+          return;
+        }
+
         const idToken = utils.getAuthToken();
         const localId = utils.getLocalId();
 
         if (!idToken || !localId) {
-            utils.clearAuthData();
-            setUser(null);
-          // throw new Error("Người dùng chưa đăng nhập!");
-          // return showToast("error", "Vui lòng đăng nhập!");
+          throw new Error("Thiếu thông tin xác thực!");
         }
 
-        await axios.get(utils.API_URL.CHECK_AUTH_URL, {
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-            "X-User-Id": localId,
-          },
-          withCredentials: true,
-        });
+        const userData = await locketService.getInfo(idToken, localId);
+        if (!userData || !userData.uid) {
+          throw new Error("Thông tin người dùng không hợp lệ!");
+        }
 
         if (isMounted) {
-          try {
-            const userData = await locketService.getInfo(idToken);
-            utils.saveUser(userData);
-          } catch (error) {
-
-            utils.removeUser();
-            utils.clearAuthData();
-
-            console.error("Không lấy được thông tin người dùng:", error);
-          }
+          setUser(userData);
         }
       } catch (error) {
         if (isMounted) {
-          
-          utils.removeUser();
           utils.clearAuthData();
-          
-          console.warn("Lỗi xác thực:", error);
-
           setUser(null);
+          showToast("error", "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!");
+          window.location.href = "/login"; // Chuyển hướng đến trang đăng nhập
         }
       } finally {
         if (isMounted) setLoading(false);
       }
     };
 
-    checkAuth();
+    // Chỉ gọi API nếu chưa có user
+    if (!user) checkAuth();
 
     return () => {
       isMounted = false;
-    }; // Cleanup tránh memory leak
-  }, []);
-
+    };
+  }, [user]);
 
   return useMemo(
     () => (

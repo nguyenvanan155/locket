@@ -82,17 +82,11 @@ const Post = () => {
 
     formData.append("idToken", utils.getAuthToken());
     formData.append("localId", utils.getLocalId());
-
     formData.append("caption", caption);
-    // Gửi option dưới dạng JSON string
-    const options = {
-      isGif: "false",
-      text_color: colorText || "#000000E6",
-      colors: `${colorTop || "#00FA9A"},${
-        colorBottom || "#1E90FF"
-      },#FF69B4,#FF69B4`,
-    };
-    formData.append("options", JSON.stringify(options));
+    formData.append("isGif", "false");
+    formData.append("text_color", colorText || "#000000E6");
+    formData.append("colorTop", colorTop || "#00FA9A");
+    formData.append("colorBottom", colorBottom || "#1E90FF");
 
     console.log("🛠️ FormData gửi đi:", Object.fromEntries(formData.entries())); // Kiểm tra dữ liệu gửi đi
 

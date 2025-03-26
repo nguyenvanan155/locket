@@ -1,5 +1,5 @@
-const BASE_API_URL = "https://my-api-locket.vercel.app"; //http://localhost:5004
-//const BASE_API_URL = "http://localhost:5004";
+//const BASE_API_URL = "https://my-api-locket.vercel.app"; //http://localhost:5004
+const BASE_API_URL = "http://localhost:5004";
 
 const LOCKET_URL = "/locket";
 
