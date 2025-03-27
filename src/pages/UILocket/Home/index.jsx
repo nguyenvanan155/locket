@@ -1,5 +1,14 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Camera, RotateCw, AlertTriangle } from "lucide-react";
+import {
+  Camera,
+  RotateCw,
+  AlertTriangle,
+  Undo2,
+  CircleDot,
+  FileUp,
+  RefreshCcw,
+  Sparkles,
+} from "lucide-react";
 
 const CameraCapture = ({ onCapture }) => {
   const videoRef = useRef(null);
@@ -60,6 +69,10 @@ const CameraCapture = ({ onCapture }) => {
   const toggleCamera = () => {
     setCameraMode((prev) => (prev === "front" ? "back" : "front"));
   };
+  const handleRetake = () => {
+    setCapturedMedia(null);
+    startCamera(); // Mở lại camera ngay sau khi xóa media
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-base-200 p-4">
@@ -73,32 +86,63 @@ const CameraCapture = ({ onCapture }) => {
       <div className="relative w-full max-w-md aspect-square bg-gray-800 rounded-lg overflow-hidden">
         {capturedMedia ? (
           capturedMedia.type === "image" ? (
-            <img src={capturedMedia.data} alt="Captured" className="w-full h-full object-cover" />
+            <img
+              src={capturedMedia.data}
+              alt="Captured"
+              className="w-full h-full object-cover"
+            />
           ) : (
-            <video src={capturedMedia.data} controls className="w-full h-full object-cover" />
+            <video
+              src={capturedMedia.data}
+              controls
+              className="w-full h-full object-cover"
+            />
           )
         ) : (
           <video
             ref={videoRef}
             autoPlay
             playsInline
-            className={`w-full h-full object-cover ${cameraMode === "front" ? "scale-x-[-1]" : ""}`}
+            className={`w-full h-full object-cover ${
+              cameraMode === "front" ? "scale-x-[-1]" : ""
+            }`}
           />
         )}
       </div>
 
-      <div className="flex gap-4 mt-4">
+      <div className="flex gap-10 mt-4 max-w-md items-center content-between">
         {capturedMedia ? (
-          <button onClick={() => setCapturedMedia(null)} className="btn btn-secondary">
-            <RotateCw size={24} /> Retake
-          </button>
+          <>
+            <button onClick={handleRetake} className="btn btn-secondary">
+              <Undo2 size={24} /> Retake
+            </button>
+
+            <button
+              onClick={handleCapturePhoto}
+              className="btn btn-circle w-24 h-24 btn-primary"
+            >
+              <Camera size={45} />
+            </button>
+
+            <button onClick={toggleCamera} className="btn btn-primary">
+              <Sparkles size={24} /> Add Filter
+            </button>
+          </>
         ) : (
           <>
-            <button onClick={handleCapturePhoto} className="btn btn-accent text-white">
-              <Camera size={30} /> Capture
-            </button>
             <button onClick={toggleCamera} className="btn btn-primary">
-              <RotateCw size={24} /> Switch Camera
+              <FileUp size={24} /> Choose File
+            </button>
+
+            <button
+              onClick={handleCapturePhoto}
+              className="btn btn-circle w-24 h-24 btn-primary"
+            >
+              <Camera size={45} />
+            </button>
+
+            <button onClick={toggleCamera} className="btn btn-primary">
+              <RefreshCcw size={24} /> Switch Camera
             </button>
           </>
         )}
