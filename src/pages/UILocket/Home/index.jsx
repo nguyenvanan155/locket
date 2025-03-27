@@ -8,6 +8,9 @@ import {
   FileUp,
   RefreshCcw,
   Sparkles,
+  Send,
+  Trash2,
+  Upload
 } from "lucide-react";
 
 const CameraCapture = ({ onCapture }) => {
@@ -16,22 +19,24 @@ const CameraCapture = ({ onCapture }) => {
   const mediaRecorderRef = useRef(null);
   const [hasPermission, setHasPermission] = useState(null);
   const [capturedMedia, setCapturedMedia] = useState(null);
-  const [cameraMode, setCameraMode] = useState("front"); // "front" = Front camera, "back" = Back camera
+  const [cameraMode, setCameraMode] = useState("front");
   const [isRecording, setIsRecording] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState(false);
+  const [recordingProgress, setRecordingProgress] = useState(0);
   const chunksRef = useRef([]);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     checkCameraPermission();
   }, []);
-  
+
   useEffect(() => {
     if (!permissionDenied) {
       startCamera();
     }
     return () => stopCamera();
   }, [cameraMode, permissionDenied]);
-  
+
   const checkCameraPermission = async () => {
     try {
       const result = await navigator.permissions.query({ name: "camera" });
@@ -89,85 +94,84 @@ const CameraCapture = ({ onCapture }) => {
     const imageData = canvasRef.current.toDataURL("image/png");
 
     setCapturedMedia({ type: "image", data: imageData });
-    stopCamera();
   };
 
-  const toggleCamera = () => {
-    setCameraMode((prev) => (prev === "front" ? "back" : "front"));
+  const startRecording = () => {
+    if (!videoRef.current) return;
+    chunksRef.current = [];
+    const stream = videoRef.current.srcObject;
+    mediaRecorderRef.current = new MediaRecorder(stream);
+
+    mediaRecorderRef.current.ondataavailable = (event) => {
+      if (event.data.size > 0) chunksRef.current.push(event.data);
+    };
+
+    mediaRecorderRef.current.onstop = () => {
+      const blob = new Blob(chunksRef.current, { type: "video/webm" });
+      const videoUrl = URL.createObjectURL(blob);
+      setCapturedMedia({ type: "video", data: videoUrl });
+      setRecordingProgress(0);
+    };
+
+    mediaRecorderRef.current.start();
+    setIsRecording(true);
+    let progress = 0;
+    timerRef.current = setInterval(() => {
+      progress += 10;
+      setRecordingProgress(progress);
+      if (progress >= 100) stopRecording();
+    }, 1000);
   };
-  const handleRetake = () => {
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+    clearInterval(timerRef.current);
+  };
+
+  const handleDelete = () => {
     setCapturedMedia(null);
-    startCamera(); // Mở lại camera ngay sau khi xóa media
+    startCamera();
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-base-200 p-4">
-      {permissionDenied && (
-        <div className="text-white text-center p-4 bg-red-500 rounded-md">
-          <AlertTriangle size={24} className="inline-block mr-2" />
-          Please allow camera access in your browser settings!
-        </div>
-      )}
-
-      <div className="relative w-full max-w-md aspect-square bg-gray-800 rounded-lg overflow-hidden">
+      <div className="relative w-full max-w-md aspect-square bg-gray-800 rounded-lg overflow-hidden border-4 border-blue-500" style={{ borderImage: `linear-gradient(to right, #00f ${recordingProgress}%, transparent ${recordingProgress}%) 1` }}>
         {capturedMedia ? (
           capturedMedia.type === "image" ? (
-            <img
-              src={capturedMedia.data}
-              alt="Captured"
-              className="w-full h-full object-cover"
-            />
+            <img src={capturedMedia.data} alt="Captured" className="w-full h-full object-cover" />
           ) : (
-            <video
-              src={capturedMedia.data}
-              controls
-              className="w-full h-full object-cover"
-            />
+            <video src={capturedMedia.data} controls className="w-full h-full object-cover" />
           )
         ) : (
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            className={`w-full h-full object-cover ${
-              cameraMode === "front" ? "scale-x-[-1]" : ""
-            }`}
-          />
+          <video ref={videoRef} autoPlay playsInline className={`w-full h-full object-cover ${cameraMode === "front" ? "scale-x-[-1]" : ""}`} />
         )}
       </div>
 
-      <div className="flex gap-10 mt-4 max-w-md items-center content-between">
+      <div className="flex gap-4 mt-4 max-w-md items-center content-between">
         {capturedMedia ? (
           <>
-            <button onClick={handleRetake} className="btn btn-secondary">
-              <Undo2 size={24} /> Retake
+            <button onClick={handleDelete} className="btn btn-danger">
+              <Trash2 size={24} /> Delete
             </button>
-
-            <button
-              onClick={handleCapturePhoto}
-              className="btn btn-circle w-24 h-24 btn-primary"
-            >
-              <Camera size={45} />
+            <button className="btn btn-success">
+              <Send size={24} /> Send
             </button>
-
-            <button onClick={toggleCamera} className="btn btn-primary">
-              <Sparkles size={24} /> Add Filter
+            <button className="btn btn-primary">
+              <Sparkles size={24} /> Add Effect
             </button>
           </>
         ) : (
           <>
-            <button onClick={toggleCamera} className="btn btn-primary">
-              <FileUp size={24} /> Choose File
+            <button className="btn btn-secondary">
+              <Upload size={24} /> Upload File
             </button>
-
-            <button
-              onClick={handleCapturePhoto}
-              className="btn btn-circle w-24 h-24 btn-primary"
-            >
+            <button onMouseDown={startRecording} onMouseUp={stopRecording} onClick={handleCapturePhoto} className="btn btn-circle w-24 h-24 btn-primary">
               <Camera size={45} />
             </button>
-
-            <button onClick={toggleCamera} className="btn btn-primary">
+            <button onClick={() => setCameraMode(cameraMode === "front" ? "back" : "front")} className="btn btn-secondary">
               <RefreshCcw size={24} /> Switch Camera
             </button>
           </>
