@@ -14,6 +14,7 @@ const CameraCapture = ({ onCapture }) => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const mediaRecorderRef = useRef(null);
+  const [hasPermission, setHasPermission] = useState(null);
   const [capturedMedia, setCapturedMedia] = useState(null);
   const [cameraMode, setCameraMode] = useState("front"); // "front" = Front camera, "back" = Back camera
   const [isRecording, setIsRecording] = useState(false);
@@ -21,11 +22,36 @@ const CameraCapture = ({ onCapture }) => {
   const chunksRef = useRef([]);
 
   useEffect(() => {
-    startCamera();
+    checkCameraPermission();
+  }, []);
+  
+  useEffect(() => {
+    if (!permissionDenied) {
+      startCamera();
+    }
     return () => stopCamera();
-  }, [cameraMode]);
+  }, [cameraMode, permissionDenied]);
+  
+  const checkCameraPermission = async () => {
+    try {
+      const result = await navigator.permissions.query({ name: "camera" });
+      if (result.state === "granted") {
+        setHasPermission(true);
+        startCamera();
+      } else if (result.state === "denied") {
+        setHasPermission(false);
+        setPermissionDenied(true);
+      }
+      result.onchange = () => {
+        setHasPermission(result.state === "granted");
+      };
+    } catch (error) {
+      console.error("Permission API not supported", error);
+    }
+  };
 
   const startCamera = async () => {
+    if (permissionDenied || hasPermission === false) return;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: cameraMode === "front" ? "user" : "environment" },
