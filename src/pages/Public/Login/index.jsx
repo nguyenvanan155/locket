@@ -17,15 +17,16 @@ const Login = () => {
     try {
       const res = await locketService.login(email, password);
       if (!res) throw new Error("Lỗi: Server không trả về dữ liệu!");
-
+      console.log(res.user)
       // Lưu token & localId ngay sau khi login
-      utils.saveAuthData(res.user.idToken, res.user.localId, parseInt(res.user.expiresIn, 10));
+      utils.setAuthCookies(res.user.idToken, res.user.localId, parseInt(res.user.expiresIn, 10));
       showToast("success", "Đăng nhập thành công!");
 
       // Lấy token sau khi lưu
-      const idToken = utils.getAuthToken();
-      const localId = utils.getLocalId();
-
+      const idToken = utils.getAuthCookies().idToken;
+      const localId = utils.getAuthCookies().localId;
+      
+      console.log(res.user.idToken)
       // Lấy thông tin người dùng
       const userData = await locketService.getInfo(idToken, localId);
       if (!userData) throw new Error("Không thể lấy thông tin người dùng!");

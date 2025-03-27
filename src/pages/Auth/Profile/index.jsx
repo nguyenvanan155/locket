@@ -49,6 +49,7 @@ export default function Profile() {
       {/* Thông tin cơ bản */}
       <div className="flex flex-row items-center bg-base-100 border-base-300 text-base-content p-6 rounded-lg shadow-lg w-full max-w-2xl">
         <div className="avatar relative w-24 h-24  disable-select">
+          <div className=" rounded-full shadow-md outline-4 outline-amber-400 flex justify-items-center">
           {!imageLoaded && (
             <div className="absolute inset-0 flex items-center justify-center">
               <LoadingRing size={40} stroke={5} color="blue" />
@@ -57,11 +58,12 @@ export default function Profile() {
           <img
             src={user?.profilePicture || "/default-avatar.png"}
             alt="Profile"
-            className={`w-24 h-24 rounded-full shadow-md outline-4 outline-amber-400 transition-opacity duration-300 ${
+            className={`w-24 h-24 transition-opacity duration-300 ${
               imageLoaded ? "opacity-100" : "opacity-0"
             }`}
             onLoad={() => setImageLoaded(true)}
           />
+          </div>
         </div>
         <div className="flex flex-col pl-5 text-center items-start">
           <h2 className="text-2xl font-semibold">

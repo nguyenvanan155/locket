@@ -1,7 +1,15 @@
 import React, { useState, useRef } from "react";
-import axios from "axios";
-import { FolderOpen, Video, RotateCcw, Send, Palette, Pencil } from "lucide-react";
+import {
+  FolderOpen,
+  Video,
+  RotateCcw,
+  Send,
+  Palette,
+  Pencil,
+} from "lucide-react";
 import { showToast } from "../../../components/Toast/index.jsx";
+import * as lockerService from "../../../services/locketService.js";
+import * as utils from "../../../utils";
 
 const PostVideo = () => {
   const [caption, setCaption] = useState("");
@@ -37,19 +45,14 @@ const PostVideo = () => {
 
     setIsUploading(true);
     const formData = new FormData();
-    formData.append("video", file);
+    formData.append("videos", file);
     formData.append("caption", caption);
+    formData.append("idToken", utils.getAuthCookies().idToken);
+    formData.append("localId", utils.getAuthCookies().localId);
 
     try {
-      const response = await axios.post("https://your-api.com/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      if (response.data.success) {
-        showToast("success", "Video đã được tải lên và chuyển đổi thành MP4!");
-      } else {
-        showToast("error", "Tải lên thất bại!");
-      }
+      const response = await lockerService.uploadMedia(formData);
+        showToast("success", "Video đã được tải lên!");
     } catch (error) {
       showToast("error", "Lỗi khi tải video lên!");
       console.error(error);
@@ -83,9 +86,13 @@ const PostVideo = () => {
         {/* Xem trước video */}
         <div className="text-center mb-6">
           <h2 className="text-3xl font-semibold mb-4">Video Preview</h2>
-          <div className="relative w-full max-w-[400px] aspect-video border border-base-content rounded-lg overflow-hidden flex items-center justify-center">
+          <div className="relative w-[400px] h-[400px] border border-base-content rounded-lg overflow-hidden flex items-center justify-center">
             {previewUrl ? (
-              <video src={previewUrl} controls className="w-full h-full" />
+              <video
+                src={previewUrl}
+                controls
+                className="w-full h-full object-cover"
+              />
             ) : (
               <div className="flex flex-col items-center">
                 <Video size={80} />

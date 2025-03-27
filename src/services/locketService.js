@@ -43,29 +43,20 @@ export const getInfocheckAuth = async (idToken, localId) => {
 
     const res = await axios.post(utils.API_URL.CHECK_AUTH_URL, { idToken, localId });
 
-    if (!res.data || !res.data.user) {
-      throw new Error("Dữ liệu trả về không hợp lệ!");
-    }
-
-    return res.data.user;
+    return res.status; // Chỉ trả về status
   } catch (error) {
-    let errorMessage = "Lỗi không xác định!";
-    
-    if (error.response) {
-      // Lỗi từ server
-      errorMessage = error.response.data?.message || "Lỗi từ server!";
-    } else if (error.request) {
-      // Lỗi kết nối (không nhận được phản hồi)
-      errorMessage = "Không thể kết nối đến server! Kiểm tra mạng của bạn.";
-    } else {
-      // Lỗi khác
-      errorMessage = error.message;
-    }
+    console.error("❌ Lỗi khi kiểm tra xác thực:", error);
 
-    console.error("❌ Lỗi khi lấy thông tin người dùng:", errorMessage);
-    throw new Error(errorMessage); // Quăng lỗi để xử lý trong component
+    if (error.response) {
+      throw new Error(error.response.status); // Quăng lỗi với mã trạng thái từ server
+    } else if (error.request) {
+      throw new Error("503"); // Lỗi kết nối, giả định mã 503 (Service Unavailable)
+    } else {
+      throw new Error("500"); // Lỗi không xác định, giả định mã 500
+    }
   }
 };
+
 export const getInfo = async (idToken, localId) => {
   try {
     if (!idToken) {

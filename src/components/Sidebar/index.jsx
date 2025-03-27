@@ -109,6 +109,15 @@ const Sidebar = ({ isOpen, setIsOpen, user, setUser }) => {
                 </li>
                 <li>
                   <Link
+                    to="/postvideo"
+                    className={`flex items-center px-3 py-3 rounded-lg transition ${location.pathname === "/postvideo" ? "bg-base-300" : "hover:bg-base-200"}`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Upload size={22} /> Post Video
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     to="/profile"
                     className={`flex items-center px-3 py-3 rounded-lg transition ${location.pathname === "/profile" ? "bg-base-300" : "hover:bg-base-200"}`}
                     onClick={() => setIsOpen(false)}

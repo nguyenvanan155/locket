@@ -80,8 +80,8 @@ const Post = () => {
       return;
     }
 
-    formData.append("idToken", utils.getAuthToken());
-    formData.append("localId", utils.getLocalId());
+    formData.append("idToken", utils.getAuthCookies().idToken);
+    formData.append("localId", utils.getAuthCookies().localId);
     formData.append("caption", caption);
     formData.append("isGif", "false");
     formData.append("text_color", colorText || "#000000E6");

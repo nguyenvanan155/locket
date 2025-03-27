@@ -2,12 +2,11 @@ import { createContext, useEffect, useState, useMemo } from "react";
 import PropTypes from "prop-types";
 import * as utils from "../utils";
 import { showToast } from "../components/Toast";
-import * as locketService from "../services/locketService";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(utils.getUser());
+  const [user, setUser] = useState(utils.getUser()); // Giữ nguyên user từ localStorage
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,23 +14,21 @@ export const AuthProvider = ({ children }) => {
 
     const checkAuth = async () => {
       try {
-        const idToken = utils.getAuthToken();
-        const localId = utils.getLocalId();
+        const idToken = utils.getAuthCookies().idToken;
+        const localId = utils.getAuthCookies().localId;
 
-        if (!idToken) {
-          utils.clearAuthData();
+        if (!idToken || !localId) {
+          utils.clearAuthCookies();
+          utils.removeUser();
           setUser(null);
           return;
         }
 
-        const userData = await locketService.getInfo(idToken, localId);
-        if (isMounted) {
-          // utils.saveUser(userData);
-          // setUser(userData);
-        }
+        // Không gọi API nữa, giữ nguyên user từ localStorage
       } catch (error) {
         if (isMounted) {
-          utils.clearAuthData();
+          utils.clearAuthCookies();
+          utils.removeUser();
           setUser(null);
           showToast("error", "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!");
           window.location.href = "/login"; // Chuyển hướng đến trang đăng nhập
