@@ -138,7 +138,7 @@ const CameraCapture = ({ onCapture }) => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-base-200 p-4">
-      <div className="relative w-full max-w-md aspect-square bg-gray-800 rounded-lg overflow-hidden border-4 border-blue-500" style={{ borderImage: `linear-gradient(to right, #00f ${recordingProgress}%, transparent ${recordingProgress}%) 1` }}>
+      <div className="relative w-full rounded-4xl max-w-md aspect-square bg-gray-800 rounded-lg overflow-hidden border-4 border-blue-500" style={{ borderImage: `linear-gradient(to right, #00f ${recordingProgress}%, transparent ${recordingProgress}%) 1` }}>
         {capturedMedia ? (
           capturedMedia.type === "image" ? (
             <img src={capturedMedia.data} alt="Captured" className="w-full h-full object-cover" />
