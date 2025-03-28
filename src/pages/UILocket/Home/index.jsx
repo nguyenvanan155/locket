@@ -22,6 +22,7 @@ const CameraCapture = ({ onCapture }) => {
   const [recordingProgress, setRecordingProgress] = useState(0);
   const [selectedFile, setSelectedFile] = useState(null);
   const [caption, setCaption] = useState("");
+  const [pressStartTime, setPressStartTime] = useState(null);
 
   useEffect(() => {
     checkCameraPermission();
@@ -151,6 +152,26 @@ const CameraCapture = ({ onCapture }) => {
     // Handle submission (e.g., sending to API)
   };
 
+  const handlePressStart = () => {
+    setPressStartTime(Date.now());
+  };
+
+  const handlePressEnd = () => {
+    const pressDuration = Date.now() - pressStartTime;
+    if (pressDuration < 500) {
+      // Short press, capture photo
+      handleCapturePhoto();
+    } else {
+      // Long press, start/stop recording video
+      if (!isRecording) {
+        startRecording();
+      } else {
+        stopRecording();
+      }
+    }
+    setPressStartTime(null);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <h1 className="text-3xl -mt-20 mb-6">Locket Upload</h1>
@@ -208,7 +229,11 @@ const CameraCapture = ({ onCapture }) => {
                 <Image size={35} />
               </label>
             </div>
-            <button onMouseDown={startRecording} onMouseUp={stopRecording} onClick={handleCapturePhoto} className="btn btn-circle w-20 h-20 btn-primary mx-4">
+            <button
+              onMouseDown={handlePressStart}
+              onMouseUp={handlePressEnd}
+              className="btn btn-circle w-20 h-20 btn-primary mx-4"
+            >
               <Camera size={45} />
             </button>
             <button onClick={() => setCameraMode(cameraMode === "front" ? "back" : "front")}>
