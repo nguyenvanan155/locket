@@ -87,37 +87,38 @@ const CameraCapture = ({ onCapture }) => {
   };
 
   const startRecording = () => {
-    if (!videoRef.current) return;
+    // Check if video stream is available
+    if (!videoRef.current || !videoRef.current.srcObject) {
+      console.error("No media stream available for recording");
+      return;
+    }
+  
     chunksRef.current = [];
     const stream = videoRef.current.srcObject;
-    mediaRecorderRef.current = new MediaRecorder(stream);
-
-    mediaRecorderRef.current.ondataavailable = (event) => {
-      if (event.data.size > 0) chunksRef.current.push(event.data);
-    };
-
-    mediaRecorderRef.current.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: "video/webm" });
-      const videoUrl = URL.createObjectURL(blob);
-      setCapturedMedia({ type: "video", data: videoUrl });
+  
+    try {
+      // Initialize MediaRecorder with the media stream
+      mediaRecorderRef.current = new MediaRecorder(stream);
+  
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        if (event.data.size > 0) chunksRef.current.push(event.data);
+      };
+  
+      mediaRecorderRef.current.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: "video/webm" });
+        const videoUrl = URL.createObjectURL(blob);
+        setCapturedMedia({ type: "video", data: videoUrl });
+        setRecordingProgress(0);
+      };
+  
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
       setRecordingProgress(0);
-    };
-
-    mediaRecorderRef.current.start();
-    setIsRecording(true);
-    setRecordingProgress(0);
-
-    // Limit recording to 10 seconds max
-    setRecordingTimeout(setTimeout(stopRecording, 10000));
-
-    let progress = 0;
-    timerRef.current = setInterval(() => {
-      progress += 10;
-      setRecordingProgress(progress);
-      if (progress >= 100) stopRecording();
-    }, 1000);
+    } catch (error) {
+      console.error("Failed to start recording: ", error);
+    }
   };
-
+  
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
@@ -161,26 +162,24 @@ const CameraCapture = ({ onCapture }) => {
 
   const handlePressStart = () => {
     setPressStartTime(Date.now());
+    startRecording(); // Start recording when the button is pressed
   };
 
   const handlePressEnd = () => {
     const pressDuration = Date.now() - pressStartTime;
-    if (pressDuration < 200) {
-      // Short press, capture photo
-      handleCapturePhoto();
-    } else {
-      // Long press, start/stop recording video
-      if (!isRecording) {
-        startRecording();
-      } else {
-        stopRecording();
-      }
+    if (pressDuration >= 200) {
+      // Long press, stop recording
+      stopRecording();
     }
-    setPressStartTime(null);
+  };
+
+  const handlePressLeave = () => {
+    // If the mouse leaves the button before releasing, stop recording
+    stopRecording();
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen inset-0 bg-locket -z-50">
+    <div className="flex flex-col items-center justify-center h-screen min-h-screen inset-0 bg-locket -z-50">
       <h1 className="text-3xl -mt-20 mb-6 font-semibold">Locket Upload</h1>
       <div className="relative w-full max-w-md aspect-square bg-gray-800 rounded-[60px] overflow-hidden">
   <div className="absolute z-50 h-full w-full border-6 rounded-[60px] hidden"></div>
@@ -214,7 +213,6 @@ const CameraCapture = ({ onCapture }) => {
   )}
 </div>
 
-
       <div className="flex gap-4 w-full h-40 max-w-md justify-evenly items-center">
         {capturedMedia || selectedFile ? (
           <>
@@ -245,7 +243,8 @@ const CameraCapture = ({ onCapture }) => {
             <button
               onMouseDown={handlePressStart}
               onMouseUp={handlePressEnd}
-              className="btn btn-circle w-18 h-18 bg-base-300 mx-4 outline-5 outline-offset-3 outline-accent"
+              onMouseLeave={handlePressLeave}
+              className="rounded-full w-18 h-18 bg-base-300 mx-4 outline-5 outline-offset-3 outline-accent"
             >
             </button>
             <button className="cursor-pointer" onClick={() => setCameraMode(cameraMode === "front" ? "back" : "front")}>
