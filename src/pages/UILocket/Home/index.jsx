@@ -225,7 +225,7 @@ const CameraCapture = ({ onCapture }) => {
       <div className="flex gap-4 w-full h-40 max-w-md justify-evenly items-center">
         {capturedMedia || selectedFile ? (
           <>
-            <button onClick={handleDelete}>
+            <button className="cursor-pointer" onClick={handleDelete}>
               <X size={35}/>
             </button>
             <button onClick={handleSubmit} className="btn btn-circle w-22 h-22 backdrop-blur-md transition-opacity duration-300 outline-base-300 bg-white/98 mx-4">
@@ -252,10 +252,10 @@ const CameraCapture = ({ onCapture }) => {
             <button
               onMouseDown={handlePressStart}
               onMouseUp={handlePressEnd}
-              className="btn btn-circle w-18 h-18 bg-base-300 mx-4 outline-5 outline-accent"
+              className="btn btn-circle w-18 h-18 bg-base-300 mx-4 outline-5 outline-offset-3 outline-accent"
             >
             </button>
-            <button onClick={() => setCameraMode(cameraMode === "front" ? "back" : "front")}>
+            <button className="cursor-pointer" onClick={() => setCameraMode(cameraMode === "front" ? "back" : "front")}>
               <RefreshCcw size={35} className="transform rotate-[-30deg]"/>
             </button>
           </>
