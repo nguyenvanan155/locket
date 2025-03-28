@@ -13,19 +13,16 @@ const CameraCapture = ({ onCapture }) => {
   const [cameraActive, setCameraActive] = useState(true);
   const [rotation, setRotation] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
-  const [recordingProgress, setRecordingProgress] = useState(0);
   const mediaRecorderRef = useRef(null);
   const recordedChunksRef = useRef([]);
   const pressTimer = useRef(null);
   const pressStartTime = useRef(null);
-  const progressIntervalRef = useRef(null);
 
   useEffect(() => {
     if (cameraActive) checkCameraPermission();
     return () => {
       stopCamera();
       clearTimeout(pressTimer.current);
-      clearInterval(progressIntervalRef.current);
     };
   }, [cameraMode, cameraActive]);
 
@@ -48,10 +45,11 @@ const CameraCapture = ({ onCapture }) => {
     if (permissionDenied || hasPermission === false || !cameraActive) return;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { 
+        video: {
           facingMode: cameraMode === "front" ? "user" : "environment",
         },
       });
+      console.log(cameraMode);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
@@ -98,11 +96,11 @@ const CameraCapture = ({ onCapture }) => {
 
   const startRecording = async () => {
     if (!videoRef.current || isRecording) return;
-    
+
     const stream = videoRef.current.srcObject;
     recordedChunksRef.current = [];
     mediaRecorderRef.current = new MediaRecorder(stream, {
-      mimeType: "video/webm"
+      mimeType: "video/webm",
     });
 
     mediaRecorderRef.current.ondataavailable = (event) => {
@@ -113,7 +111,8 @@ const CameraCapture = ({ onCapture }) => {
 
     mediaRecorderRef.current.onstop = async () => {
       const blob = new Blob(recordedChunksRef.current, { type: "video/webm" });
-      
+
+      // Xử lý video từ camera trước
       if (cameraMode === "front") {
         const correctedBlob = await correctFrontCameraVideo(blob);
         const url = URL.createObjectURL(correctedBlob);
@@ -128,24 +127,13 @@ const CameraCapture = ({ onCapture }) => {
           data: url,
         });
       }
-      
+
       setCameraActive(false);
       setIsRecording(false);
-      setRecordingProgress(0);
-      clearInterval(progressIntervalRef.current);
     };
 
     setIsRecording(true);
-    setRecordingProgress(0);
     mediaRecorderRef.current.start();
-
-    // Cập nhật tiến trình
-    const startTime = Date.now();
-    progressIntervalRef.current = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min((elapsed / 10000) * 100, 100);
-      setRecordingProgress(progress);
-    }, 100);
 
     setTimeout(() => {
       if (mediaRecorderRef.current && isRecording) {
@@ -154,6 +142,7 @@ const CameraCapture = ({ onCapture }) => {
     }, 10000);
   };
 
+  // Hàm xử lý video từ camera trước để sửa hướng
   const correctFrontCameraVideo = (blob) => {
     return new Promise((resolve) => {
       const video = document.createElement("video");
@@ -161,14 +150,14 @@ const CameraCapture = ({ onCapture }) => {
       video.onloadedmetadata = () => {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-        // Đảm bảo video vuông
-        const size = Math.min(video.videoWidth, video.videoHeight);
-        canvas.width = size;
-        canvas.height = size;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
 
         video.onplay = () => {
           const stream = canvas.captureStream();
-          const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+          const recorder = new MediaRecorder(stream, {
+            mimeType: "video/webm",
+          });
           const chunks = [];
 
           recorder.ondataavailable = (e) => chunks.push(e.data);
@@ -185,13 +174,9 @@ const CameraCapture = ({ onCapture }) => {
               return;
             }
             ctx.save();
-            if (cameraMode === "front") {
-              ctx.translate(size, 0);
-              ctx.scale(-1, 1);
-            }
-            const xOffset = (video.videoWidth - size) / 2;
-            const yOffset = (video.videoHeight - size) / 2;
-            ctx.drawImage(video, xOffset, yOffset, size, size, 0, 0, size, size);
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             ctx.restore();
             requestAnimationFrame(drawFrame);
           };
@@ -219,7 +204,7 @@ const CameraCapture = ({ onCapture }) => {
   const handleMouseUp = () => {
     const pressDuration = Date.now() - pressStartTime.current;
     clearTimeout(pressTimer.current);
-    
+
     if (pressDuration < 200 && !isRecording) {
       handleCapturePhoto();
     } else if (isRecording) {
@@ -239,7 +224,7 @@ const CameraCapture = ({ onCapture }) => {
     e.preventDefault();
     const pressDuration = Date.now() - pressStartTime.current;
     clearTimeout(pressTimer.current);
-    
+
     if (pressDuration < 200 && !isRecording) {
       handleCapturePhoto();
     } else if (isRecording) {
@@ -281,23 +266,6 @@ const CameraCapture = ({ onCapture }) => {
     <div className="flex flex-col items-center justify-center h-screen min-h-screen inset-0 bg-locket -z-50">
       <h1 className="text-3xl mb-6 font-semibold">Locket Upload</h1>
       <div className="relative w-full max-w-md aspect-square bg-gray-800 rounded-[60px] overflow-hidden">
-        {/* Vòng tiến trình khi quay */}
-        {isRecording && (
-          <svg className="absolute inset-0 w-full h-full pointer-events-none">
-            <circle
-              cx="50%"
-              cy="50%"
-              r="48%"
-              fill="none"
-              stroke="#ef4444"
-              strokeWidth="8"
-              strokeDasharray="301.6"
-              strokeDashoffset={301.6 * (1 - recordingProgress / 100)}
-              className="transition-all duration-100"
-            />
-          </svg>
-        )}
-
         {!selectedFile && cameraActive && (
           <video
             ref={videoRef}
@@ -317,7 +285,7 @@ const CameraCapture = ({ onCapture }) => {
               playsInline
               controls
               muted
-              className="w-full h-full object-contain bg-black"
+              className="absolute inset-0 w-full h-full object-cover"
             />
           </div>
         )}
@@ -325,14 +293,14 @@ const CameraCapture = ({ onCapture }) => {
           <img
             src={selectedFile.data}
             alt="Selected File"
-            className="w-full h-full object-contain bg-black select-none no-save"
+            className="w-full h-full object-cover select-none no-save"
           />
         )}
         {capturedMedia && capturedMedia.type === "image" && (
           <img
             src={capturedMedia.data}
             alt="Captured"
-            className="w-full h-full object-contain bg-black select-none no-save"
+            className="w-full h-full object-cover select-none no-save"
           />
         )}
         {capturedMedia && capturedMedia.type === "video" && (
@@ -343,7 +311,7 @@ const CameraCapture = ({ onCapture }) => {
             playsInline
             controls
             muted
-            className="w-full h-full object-contain bg-black"
+            className="w-full h-full object-cover"
           />
         )}
 
