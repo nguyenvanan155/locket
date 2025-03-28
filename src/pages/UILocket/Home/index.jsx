@@ -87,38 +87,27 @@ const CameraCapture = ({ onCapture }) => {
   };
 
   const startRecording = () => {
-    // Check if video stream is available
-    if (!videoRef.current || !videoRef.current.srcObject) {
-      console.error("No media stream available for recording");
-      return;
-    }
-  
+    if (!videoRef.current) return;
     chunksRef.current = [];
     const stream = videoRef.current.srcObject;
-  
-    try {
-      // Initialize MediaRecorder with the media stream
-      mediaRecorderRef.current = new MediaRecorder(stream);
-  
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        if (event.data.size > 0) chunksRef.current.push(event.data);
-      };
-  
-      mediaRecorderRef.current.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: "video/webm" });
-        const videoUrl = URL.createObjectURL(blob);
-        setCapturedMedia({ type: "video", data: videoUrl });
-        setRecordingProgress(0);
-      };
-  
-      mediaRecorderRef.current.start();
-      setIsRecording(true);
+    mediaRecorderRef.current = new MediaRecorder(stream);
+
+    mediaRecorderRef.current.ondataavailable = (event) => {
+      if (event.data.size > 0) chunksRef.current.push(event.data);
+    };
+
+    mediaRecorderRef.current.onstop = () => {
+      const blob = new Blob(chunksRef.current, { type: "video/webm" });
+      const videoUrl = URL.createObjectURL(blob);
+      setCapturedMedia({ type: "video", data: videoUrl });
       setRecordingProgress(0);
-    } catch (error) {
-      console.error("Failed to start recording: ", error);
-    }
+    };
+
+    mediaRecorderRef.current.start();
+    setIsRecording(true);
+    setRecordingProgress(0);
   };
-  
+
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
