@@ -1,41 +1,32 @@
 import React, { useRef, useState, useEffect } from "react";
 import {
   Camera,
-  RotateCw,
-  AlertTriangle,
-  Undo2,
-  CircleDot,
-  FileUp,
   RefreshCcw,
-  Sparkles,
-  Send,
   Trash2,
-  Upload
+  Send,
+  Sparkles,
+  Image
 } from "lucide-react";
 
 const CameraCapture = ({ onCapture }) => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const mediaRecorderRef = useRef(null);
+  const chunksRef = useRef([]);
+  const timerRef = useRef(null);
   const [hasPermission, setHasPermission] = useState(null);
   const [capturedMedia, setCapturedMedia] = useState(null);
   const [cameraMode, setCameraMode] = useState("front");
   const [isRecording, setIsRecording] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [recordingProgress, setRecordingProgress] = useState(0);
-  const chunksRef = useRef([]);
-  const timerRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [caption, setCaption] = useState("");
 
   useEffect(() => {
     checkCameraPermission();
-  }, []);
-
-  useEffect(() => {
-    if (!permissionDenied) {
-      startCamera();
-    }
     return () => stopCamera();
-  }, [cameraMode, permissionDenied]);
+  }, [cameraMode]);
 
   const checkCameraPermission = async () => {
     try {
@@ -47,11 +38,9 @@ const CameraCapture = ({ onCapture }) => {
         setHasPermission(false);
         setPermissionDenied(true);
       }
-      result.onchange = () => {
-        setHasPermission(result.state === "granted");
-      };
     } catch (error) {
       console.error("Permission API not supported", error);
+      setPermissionDenied(true);
     }
   };
 
@@ -134,12 +123,45 @@ const CameraCapture = ({ onCapture }) => {
   const handleDelete = () => {
     setCapturedMedia(null);
     startCamera();
+    setSelectedFile(null);
+    setCaption("");
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setSelectedFile({ type: "image", data: reader.result });
+        };
+        reader.readAsDataURL(file);
+      } else if (file.type.startsWith('video/')) {
+        const videoUrl = URL.createObjectURL(file);
+        setSelectedFile({ type: "video", data: videoUrl });
+      } else {
+        alert('Please select an image or video file.');
+      }
+    }
+  };
+
+  const handleSubmit = () => {
+    console.log("File: ", selectedFile);
+    console.log("Caption: ", caption);
+    // Handle submission (e.g., sending to API)
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-base-200 p-4">
-      <div className="relative w-full max-w-md aspect-square bg-gray-800 rounded-lg overflow-hidden border-4 border-blue-500" style={{ borderImage: `linear-gradient(to right, #00f ${recordingProgress}%, transparent ${recordingProgress}%) 1` }}>
-        {capturedMedia ? (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <h1 className="text-3xl -mt-20 mb-6">Locket Upload</h1>
+      <div className="relative w-full max-w-md aspect-square bg-gray-800 rounded-[60px] overflow-hidden box-border border-4 border-base">
+        {selectedFile ? (
+          selectedFile.type === "image" ? (
+            <img src={selectedFile.data} alt="Selected File" className="w-full h-full object-cover" />
+          ) : (
+            <video src={selectedFile.data} controls className="w-full h-full object-cover" />
+          )
+        ) : capturedMedia ? (
           capturedMedia.type === "image" ? (
             <img src={capturedMedia.data} alt="Captured" className="w-full h-full object-cover" />
           ) : (
@@ -148,31 +170,49 @@ const CameraCapture = ({ onCapture }) => {
         ) : (
           <video ref={videoRef} autoPlay playsInline className={`w-full h-full object-cover ${cameraMode === "front" ? "scale-x-[-1]" : ""}`} />
         )}
+        <div className="absolute bottom-0 w-full p-4">
+          <input
+            type="text"
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            placeholder="Enter caption..."
+            className="w-auto p-2 rounded-lg text-white bg-gray-700 overflow-hidden whitespace-nowrap text-ellipsis"
+          />
+        </div>
       </div>
 
-      <div className="flex gap-4 mt-4 max-w-md items-center content-between">
-        {capturedMedia ? (
+      <div className="flex gap-4 w-full mt-4 max-w-md justify-evenly items-center">
+        {capturedMedia || selectedFile ? (
           <>
-            <button onClick={handleDelete} className="btn btn-danger">
-              <Trash2 size={24} /> Delete
+            <button onClick={handleDelete}>
+              <Trash2 size={35} />
             </button>
-            <button className="btn btn-success">
-              <Send size={24} /> Send
+            <button onClick={handleSubmit} className="btn btn-circle w-20 h-20 btn-primary mx-4 pt-1.5 pr-1">
+              <Send size={45} />
             </button>
-            <button className="btn btn-primary">
-              <Sparkles size={24} /> Add Effect
+            <button>
+              <Sparkles size={35} />
             </button>
           </>
         ) : (
           <>
-            <button className="btn btn-secondary">
-              <Upload size={24} /> Upload File
-            </button>
-            <button onMouseDown={startRecording} onMouseUp={stopRecording} onClick={handleCapturePhoto} className="btn btn-circle w-24 h-24 btn-primary">
+            <div>
+              <input
+                type="file"
+                accept="image/*,video/*"
+                onChange={handleFileChange}
+                className="hidden"
+                id="file-upload"
+              />
+              <label htmlFor="file-upload" className="cursor-pointer">
+                <Image size={35} />
+              </label>
+            </div>
+            <button onMouseDown={startRecording} onMouseUp={stopRecording} onClick={handleCapturePhoto} className="btn btn-circle w-20 h-20 btn-primary mx-4">
               <Camera size={45} />
             </button>
-            <button onClick={() => setCameraMode(cameraMode === "front" ? "back" : "front")} className="btn btn-secondary">
-              <RefreshCcw size={24} /> Switch Camera
+            <button onClick={() => setCameraMode(cameraMode === "front" ? "back" : "front")}>
+              <RefreshCcw size={35} />
             </button>
           </>
         )}
