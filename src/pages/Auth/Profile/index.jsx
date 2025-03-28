@@ -105,7 +105,6 @@ export default function Profile() {
           />
         </div>
       </div>
-      <HoldButton/>
     </div>
   );
 }
