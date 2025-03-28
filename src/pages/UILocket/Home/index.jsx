@@ -182,45 +182,38 @@ const CameraCapture = ({ onCapture }) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen inset-0 bg-locket -z-50">
       <h1 className="text-3xl -mt-20 mb-6 font-semibold">Locket Upload</h1>
-      <div className="relative w-full max-w-md aspect-square bg-gray-800 rounded-[60px] overflow-hidden border-6 border-blue-600">
-        {selectedFile ? (
-          selectedFile.type === "image" ? (
-            <img src={selectedFile.data} alt="Selected File" className="w-full h-full object-cover" />
-          ) : (
-            <video src={selectedFile.data} controls className="w-full h-full object-cover" />
-          )
-        ) : capturedMedia ? (
-          capturedMedia.type === "image" ? (
-            <img src={capturedMedia.data} alt="Captured" className="w-full h-full object-cover" />
-          ) : (
-            <video src={capturedMedia.data} controls className="w-full h-full object-cover" />
-          )
-        ) : (
-          <video ref={videoRef} autoPlay playsInline className={`w-full h-full object-cover ${cameraMode === "front" ? "scale-x-[-1]" : ""}`} />
-        )}
+      <div className="relative w-full max-w-md aspect-square bg-gray-800 rounded-[60px] overflow-hidden">
+  <div className="absolute z-50 h-full w-full border-6 rounded-[60px] hidden"></div>
+  
+  {selectedFile ? (
+    selectedFile.type === "image" ? (
+      <img src={selectedFile.data} alt="Selected File" className="w-full h-full object-cover" />
+    ) : (
+      <video src={selectedFile.data} controls className="w-full h-full object-cover" />
+    )
+  ) : capturedMedia ? (
+    capturedMedia.type === "image" ? (
+      <img src={capturedMedia.data} alt="Captured" className="w-full h-full object-cover" />
+    ) : (
+      <video src={capturedMedia.data} controls className="w-full h-full object-cover" />
+    )
+  ) : (
+    <video ref={videoRef} autoPlay playsInline className={`w-full h-full object-cover ${cameraMode === "front" ? "scale-x-[-1]" : ""}`} />
+  )}
 
-        {/* Display recording progress as border */}
-        {isRecording && (
-          <div
-            className="absolute inset-0 border-4 border-base-300 rounded-[60px] transition-all"
-            style={{
-              background: `conic-gradient(#00f ${recordingProgress * 3.6}deg, transparent 0)`
-            }}
-          />
-        )}
+  {(capturedMedia || selectedFile) && (
+    <div className="absolute bottom-0 z-50 left-1/2 transform -translate-x-1/2 w-full p-4 flex justify-center items-center">
+      <input
+        type="text"
+        value={caption}
+        onChange={(e) => setCaption(e.target.value)}
+        placeholder="Enter caption..."
+        className="p-2 rounded-lg text-white bg-gray-700 max-w-full"
+      />
+    </div>
+  )}
+</div>
 
-        {(capturedMedia || selectedFile) && (
-          <div className="absolute bottom-0 w-full p-4 flex justify-items-center">
-            <input
-              type="text"
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              placeholder="Enter caption..."
-              className="w-auto p-2 rounded-lg text-white bg-gray-700 overflow-hidden whitespace-nowrap text-ellipsis"
-            />
-          </div>
-        )}
-      </div>
 
       <div className="flex gap-4 w-full h-40 max-w-md justify-evenly items-center">
         {capturedMedia || selectedFile ? (
