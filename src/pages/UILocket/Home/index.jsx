@@ -5,7 +5,8 @@ import {
   Trash2,
   Send,
   Sparkles,
-  Image
+  Image,
+  ImageUp
 } from "lucide-react";
 
 const CameraCapture = ({ onCapture }) => {
@@ -23,6 +24,7 @@ const CameraCapture = ({ onCapture }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [caption, setCaption] = useState("");
   const [pressStartTime, setPressStartTime] = useState(null);
+  const [recordingTimeout, setRecordingTimeout] = useState(null);
 
   useEffect(() => {
     checkCameraPermission();
@@ -105,6 +107,11 @@ const CameraCapture = ({ onCapture }) => {
 
     mediaRecorderRef.current.start();
     setIsRecording(true);
+    setRecordingProgress(0);
+
+    // Limit recording to 10 seconds max
+    setRecordingTimeout(setTimeout(stopRecording, 10000));
+
     let progress = 0;
     timerRef.current = setInterval(() => {
       progress += 10;
@@ -119,6 +126,8 @@ const CameraCapture = ({ onCapture }) => {
       setIsRecording(false);
     }
     clearInterval(timerRef.current);
+    clearTimeout(recordingTimeout);
+    setRecordingTimeout(null);
   };
 
   const handleDelete = () => {
@@ -158,7 +167,7 @@ const CameraCapture = ({ onCapture }) => {
 
   const handlePressEnd = () => {
     const pressDuration = Date.now() - pressStartTime;
-    if (pressDuration < 500) {
+    if (pressDuration < 200) {
       // Short press, capture photo
       handleCapturePhoto();
     } else {
@@ -174,8 +183,8 @@ const CameraCapture = ({ onCapture }) => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <h1 className="text-3xl -mt-20 mb-6">Locket Upload</h1>
-      <div className="relative w-full max-w-md aspect-square bg-gray-800 rounded-[60px] overflow-hidden box-border border-4 border-base">
+      <h1 className="text-3xl -mt-20 mb-6 font-semibold">Locket Upload</h1>
+      <div className="relative w-full max-w-md aspect-square bg-gray-800 rounded-[60px] overflow-hidden border-6 border-blue-600">
         {selectedFile ? (
           selectedFile.type === "image" ? (
             <img src={selectedFile.data} alt="Selected File" className="w-full h-full object-cover" />
@@ -191,22 +200,35 @@ const CameraCapture = ({ onCapture }) => {
         ) : (
           <video ref={videoRef} autoPlay playsInline className={`w-full h-full object-cover ${cameraMode === "front" ? "scale-x-[-1]" : ""}`} />
         )}
-        <div className="absolute bottom-0 w-full p-4">
-          <input
-            type="text"
-            value={caption}
-            onChange={(e) => setCaption(e.target.value)}
-            placeholder="Enter caption..."
-            className="w-auto p-2 rounded-lg text-white bg-gray-700 overflow-hidden whitespace-nowrap text-ellipsis"
+
+        {/* Display recording progress as border */}
+        {isRecording && (
+          <div
+            className="absolute inset-0 border-4 border-blue-600 rounded-[60px] transition-all"
+            style={{
+              background: `conic-gradient(#00f ${recordingProgress * 3.6}deg, transparent 0)`
+            }}
           />
-        </div>
+        )}
+
+        {(capturedMedia || selectedFile) && (
+          <div className="absolute bottom-0 w-full p-4 flex justify-items-center">
+            <input
+              type="text"
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              placeholder="Enter caption..."
+              className="w-auto p-2 rounded-lg text-white bg-gray-700 overflow-hidden whitespace-nowrap text-ellipsis"
+            />
+          </div>
+        )}
       </div>
 
       <div className="flex gap-4 w-full mt-4 max-w-md justify-evenly items-center">
         {capturedMedia || selectedFile ? (
           <>
             <button onClick={handleDelete}>
-              <Trash2 size={35} />
+              <Trash2 size={35}/>
             </button>
             <button onClick={handleSubmit} className="btn btn-circle w-20 h-20 btn-primary mx-4 pt-1.5 pr-1">
               <Send size={45} />
@@ -226,18 +248,17 @@ const CameraCapture = ({ onCapture }) => {
                 id="file-upload"
               />
               <label htmlFor="file-upload" className="cursor-pointer">
-                <Image size={35} />
+                <ImageUp size={35} />
               </label>
             </div>
             <button
               onMouseDown={handlePressStart}
               onMouseUp={handlePressEnd}
-              className="btn btn-circle w-20 h-20 btn-primary mx-4"
+              className="btn btn-circle w-18 h-18 btn-primary mx-4 outline-3 outline-cyan-600"
             >
-              <Camera size={45} />
             </button>
             <button onClick={() => setCameraMode(cameraMode === "front" ? "back" : "front")}>
-              <RefreshCcw size={35} />
+              <RefreshCcw size={35} className="transform rotate-[-30deg]"/>
             </button>
           </>
         )}
