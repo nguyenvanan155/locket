@@ -1,12 +1,10 @@
 import React, { useRef, useState, useEffect } from "react";
 import {
-  Camera,
   RefreshCcw,
-  Trash2,
   Send,
   Sparkles,
-  Image,
-  ImageUp
+  ImageUp,
+  X
 } from "lucide-react";
 
 const CameraCapture = ({ onCapture }) => {
@@ -182,7 +180,7 @@ const CameraCapture = ({ onCapture }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-screen inset-0 bg-locket -z-50">
       <h1 className="text-3xl -mt-20 mb-6 font-semibold">Locket Upload</h1>
       <div className="relative w-full max-w-md aspect-square bg-gray-800 rounded-[60px] overflow-hidden border-6 border-blue-600">
         {selectedFile ? (
@@ -204,7 +202,7 @@ const CameraCapture = ({ onCapture }) => {
         {/* Display recording progress as border */}
         {isRecording && (
           <div
-            className="absolute inset-0 border-4 border-blue-600 rounded-[60px] transition-all"
+            className="absolute inset-0 border-4 border-base-300 rounded-[60px] transition-all"
             style={{
               background: `conic-gradient(#00f ${recordingProgress * 3.6}deg, transparent 0)`
             }}
@@ -224,14 +222,14 @@ const CameraCapture = ({ onCapture }) => {
         )}
       </div>
 
-      <div className="flex gap-4 w-full mt-4 max-w-md justify-evenly items-center">
+      <div className="flex gap-4 w-full h-40 max-w-md justify-evenly items-center">
         {capturedMedia || selectedFile ? (
           <>
             <button onClick={handleDelete}>
-              <Trash2 size={35}/>
+              <X size={35}/>
             </button>
-            <button onClick={handleSubmit} className="btn btn-circle w-20 h-20 btn-primary mx-4 pt-1.5 pr-1">
-              <Send size={45} />
+            <button onClick={handleSubmit} className="btn btn-circle w-22 h-22 backdrop-blur-md transition-opacity duration-300 outline-base-300 bg-white/98 mx-4">
+              <Send size={40} />
             </button>
             <button>
               <Sparkles size={35} />
@@ -254,7 +252,7 @@ const CameraCapture = ({ onCapture }) => {
             <button
               onMouseDown={handlePressStart}
               onMouseUp={handlePressEnd}
-              className="btn btn-circle w-18 h-18 btn-primary mx-4 outline-3 outline-cyan-600"
+              className="btn btn-circle w-18 h-18 bg-base-300 mx-4 outline-5 outline-accent"
             >
             </button>
             <button onClick={() => setCameraMode(cameraMode === "front" ? "back" : "front")}>
