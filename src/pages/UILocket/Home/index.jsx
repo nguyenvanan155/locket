@@ -337,7 +337,7 @@ const CameraCapture = ({ onCapture }) => {
             <label htmlFor="file-upload" className="cursor-pointer">
               <ImageUp size={35} />
             </label>
-            <button
+            <label
               onMouseDown={handlePressStart}
               onMouseUp={handlePressEnd}
               onTouchStart={handlePressStart}
@@ -347,7 +347,7 @@ const CameraCapture = ({ onCapture }) => {
               className={`rounded-full w-18 h-18 mx-4 outline-5 outline-offset-3 outline-accent ${
                 isRecording ? "bg-red-500" : "bg-base-300"
               }`}
-            ></button>
+            ></label>
             <button className="cursor-pointer" onClick={handleSwitchCamera}>
               <RefreshCcw
                 size={35}
